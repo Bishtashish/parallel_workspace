@@ -115,7 +115,7 @@ public:
   virtual V get(const K& key) const {
     std::size_t index = std::hash<K>{}(key) % this->capacity;
     index = index < 0 ? index + this->capacity : index;
-    int kth_lock = index/224;
+    int kth_lock = index%224;
     // m[kth_lock].lock();
     // mu.lock();
     // cond.wait(mu, [&]() {return (done)||
