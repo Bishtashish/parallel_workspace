@@ -1,31 +1,27 @@
-CFLAGS=-O3 -std=c11 -g -fPIC -pthread -Xassembler -mrelax-relocations=no
-CXXFLAGS=-O3 -std=c++17 -g -fPIC -pthread -Xassembler -mrelax-relocations=no
-LDFLAGS=-pthread -fPIE
-LDLIBS=libintegrate.a libfunctions.a
+CFLAGS=-O3 -std=c11 -g -fPIC -pthread
+CXXFLAGS=-O3 -std=c++17 -g -fPIC -pthread
+LDFLAGS=-pthread
+LDLIBS=../libfunctions.a
 LD=g++
 
+.PHONY: plot dynamic_sched
+
+all: dynamic_sched
+
 approx:
-	$(LD) $(CXXFLAGS) $(LDFLAGS) approx.cpp $(LDLIBS) -o approx
+	$(LD) $(CXXFLAGS) $(LDFLAGS) ../approx.cpp $(LDLIBS) -o ../approx
 
-libfunctions.a: functions.o
-	ar rcs libfunctions.a functions.o
+dynamic_sched: dynamic_sched.o
+	$(LD) $(LDFLAGS) dynamic_sched.o $(LDLIBS) -o dynamic_sched
 
-libintegrate.a: sequential_lib.o
-	ar rcs libintegrate.a sequential_lib.o
+bench: dynamic_sched
+	./queue.sh 
 
-%.pdf: %.tex
-	pdflatex $<
+test: dynamic_sched approx
+	./../test.sh dynamic cases.txt
 
-ARXIVFILES=activity-parloop-static.pdf \
-           approx.cpp libintegrate.a libfunctions.a Makefile .gitignore \
-           params.sh test.sh clean.sh \
-           sequential/bench_sequential.sh sequential/loopsample.cpp sequential/Makefile sequential/queue.sh sequential/seq_loop.hpp sequential/sequential.cpp \
-           static/cases.txt static/Makefile static/plot.sh static/queue.sh static/run_static.sh static/static_sched.cpp \
-           dynamic/cases.txt dynamic/dynamic_sched.cpp dynamic/Makefile dynamic/plot.sh dynamic/queue.sh dynamic/run_dynamic.sh
+plot: 
+	./plot.sh
 
-
-
-
-activity-parloop-static.tgz: $(ARXIVFILES)
-	tar zcvf activity-parloop-static.tgz \
-                         $(ARXIVFILES)
+clean:
+	./../clean.sh
