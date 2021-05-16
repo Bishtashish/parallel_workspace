@@ -1,0 +1,30 @@
+CFLAGS=-O3 -std=c11 -fPIC -g -pthread
+CXXFLAGS=-O3 -std=c++17 -fPIC -g -pthread
+LDFLAGS=-pthread
+LDLIBS=../libfunctions.a
+ARCHIVES=../libgen.a 
+LD=g++
+
+all: lcs
+
+lcs: lcs.o
+	$(LD) $(LDFLAGS) lcs.o $(ARCHIVES) -o lcs
+
+test: lcs
+	./test.sh
+
+bench: lcs
+	./queue.sh
+
+plot:  
+	./plot.sh
+
+clean:
+	-rm *.o
+	-rm lcs
+
+distclean:
+	-rm *.sh.*
+
+
+.PHONY: lcs
